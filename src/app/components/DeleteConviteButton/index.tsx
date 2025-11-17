@@ -38,7 +38,13 @@ export default function DeleteConviteButton({ conviteId }: { conviteId: number }
 
     // Pequena animação antes de redirecionar
     setTimeout(() => {
-      Swal.fire("Excluído!", "O convite foi removido com sucesso.", "success");
+      Swal.fire({
+        title: "Excluído!", 
+        text: "O convite foi removido com sucesso.", 
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false
+      });
       router.push("/admin/convites");
     }, 600);
   }

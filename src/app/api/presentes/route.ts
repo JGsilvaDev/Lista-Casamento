@@ -10,6 +10,7 @@ export async function POST(req: Request) {
 
   const nome = formData.get("nome") as string;
   const categoria = formData.get("categoria") as string;
+  const url = (formData.get("url") as string) || "";
   const status = (formData.get("status") as string) || "Não Presentado";
   const file = formData.get("imagem") as File;
 
@@ -33,8 +34,8 @@ export async function POST(req: Request) {
   try {
     const db = await getDb();
     await db.run(
-      "INSERT INTO presentes (nome, categoria, status, imagem) VALUES (?, ?, ?, ?)",
-      [nome, categoria, status, `/uploads/${file.name}`]
+      "INSERT INTO presentes (nome, categoria, url, status, imagem) VALUES (?, ?, ?, ?)",
+      [nome, categoria, url, status, `/uploads/${file.name}`]
     );
     return NextResponse.json({ success: true });
   } catch (err) {

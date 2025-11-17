@@ -12,8 +12,6 @@ export async function DELETE(req: Request) {
       );
     }
 
-    console.log("Deletando convite com ID:", id);
-
     const db = await getDb();
 
     // Primeiro remove os convidados associados

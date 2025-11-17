@@ -56,3 +56,37 @@ export async function DELETE(
     );
   }
 }
+
+export async function PATCH(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
+
+  try {
+    const db = await getDb();
+
+    // Buscar status atual
+    const item = await db.get(
+      "SELECT status FROM presentes WHERE id = ?",
+      [id]
+    );
+
+    if (!item) {
+      return NextResponse.json({ error: "Presente não encontrado" }, { status: 404 });
+    }
+
+    const novoStatus =
+      item.status === "Presentado" ? "Não Presentado" : "Presentado";
+
+    await db.run(
+      "UPDATE presentes SET status = ? WHERE id = ?",
+      [novoStatus, id]
+    );
+
+    return NextResponse.json({ success: true, status: novoStatus });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Erro ao atualizar" }, { status: 500 });
+  }
+}

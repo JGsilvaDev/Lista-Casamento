@@ -15,8 +15,10 @@ export async function POST(req: Request) {
     );
   }
 
-  // Gera QR Code com o nome do convidado (ou link futuro)
-  const qr = await QRCode.toDataURL(`convite:${nome}`);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const conviteUrl = `${baseUrl}/confirmar?nome=${encodeURIComponent(nome)}`;
+
+  const qr = await QRCode.toDataURL(conviteUrl);
 
   // Insere convite
   const result = await db.run(

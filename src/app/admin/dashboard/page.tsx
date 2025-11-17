@@ -40,9 +40,9 @@ export default async function Dashboard() {
 
       {/* CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card title="Total de Convites" value={stats.convitesEnviados} />
         <Card title="Convidados" value={stats.totalConvidados} />
         <Card title="Confirmados" value={stats.confirmados} />
-        <Card title="Convites enviados" value={stats.convitesEnviados} />
         <Card title="Presentes comprados" value={stats.presentesComprados} />
       </div>
 

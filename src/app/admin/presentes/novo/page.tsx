@@ -10,6 +10,7 @@ export default function NovoPresentePage() {
   const [nome, setNome] = useState("");
   const [categoria, setCategoria] = useState("");
   const [status, setStatus] = useState("Não Presentado");
+  const [url, setUrl] = useState("");
   const [imagemFile, setImagemFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,6 +39,7 @@ export default function NovoPresentePage() {
       formData.append("nome", nome);
       formData.append("categoria", categoria);
       formData.append("status", status);
+      formData.append("url", url);
       formData.append("imagem", imagemFile);
 
       const res = await fetch("/api/presentes", {
@@ -116,6 +118,19 @@ export default function NovoPresentePage() {
             <option value="Não Presentado">Não Presentado</option>
             <option value="Presentado">Presentado</option>
           </select>
+        </div>
+
+        {/* Url */}
+        <div>
+          <label className="block font-semibold mb-1 text-gray-800">
+            Url
+          </label>
+          <input
+            type="text"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="border border-green-300 rounded-lg w-full p-2 text-gray-900 focus:ring-2 focus:ring-green-500 focus:outline-none"
+          />
         </div>
 
         {/* Imagem */}

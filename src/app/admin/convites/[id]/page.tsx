@@ -18,7 +18,7 @@ export default async function ConviteDetalhes({ params }: { params: { id: string
     );
   }
 
-  const linkConfirmacao = `${process.env.NEXT_PUBLIC_URL}/confirmar/${convite.id}`;
+  const linkConfirmacao = `${process.env.NEXT_PUBLIC_URL}/confirmar?nome=${convite.nome}`;
   const qrCode = await QRCode.toDataURL(linkConfirmacao);
 
   return (
@@ -71,7 +71,7 @@ export default async function ConviteDetalhes({ params }: { params: { id: string
 
           <p>
             <strong className="text-green-700">Total de pessoas:</strong>{" "}
-            {convite.totalPessoas}
+            {convite.total_pessoas}
           </p>
 
           <p>
@@ -90,11 +90,11 @@ export default async function ConviteDetalhes({ params }: { params: { id: string
             className="mb-4 rounded-lg shadow"
           />
 
-          <p className="text-sm text-gray-700 break-all text-center mb-4">
+          {/* <p className="text-sm text-gray-700 break-all text-center mb-4">
             {linkConfirmacao}
-          </p>
+          </p> */}
 
-          <QrActions link={linkConfirmacao} qrCode={qrCode} />
+          <QrActions link={linkConfirmacao} qrCode={qrCode} nome={convite.nome} />
         </div>
       </div>
 

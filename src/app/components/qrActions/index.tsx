@@ -3,9 +3,10 @@
 interface QrActionsProps {
   link: string;
   qrCode: string;
+  nome: string;
 }
 
-export default function QrActions({ link, qrCode }: QrActionsProps) {
+export default function QrActions({ link, qrCode, nome }: QrActionsProps) {
 
   function copiarLink() {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -31,7 +32,7 @@ export default function QrActions({ link, qrCode }: QrActionsProps) {
     <div className="flex gap-3">
       <a
         href={qrCode}
-        download="qrcode.png"
+        download={`${nome}_qrcode.png`}
         className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition cursor-pointer"
       >
         Baixar QR
