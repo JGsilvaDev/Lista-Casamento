@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb } from "../../../../../lib/db";
+import { sql } from "../../../../../lib/db";
 
 export async function DELETE(req: Request) {
   try {
@@ -12,16 +12,25 @@ export async function DELETE(req: Request) {
       );
     }
 
-    const db = await getDb();
+    // ============================
+    // 👥 Remove convidados primeiro
+    // ============================
+    await sql`
+      DELETE FROM convidados
+      WHERE convite_id = ${id}
+    `;
 
-    // Primeiro remove os convidados associados
-    await db.run("DELETE FROM convidados WHERE convite_id = ?", [id]);
+    // ============================
+    // 🎟 Remove convite
+    // ============================
+    const deleteRes = await sql`
+      DELETE FROM convites
+      WHERE id = ${id}
+      RETURNING id
+    `;
 
-    // Depois remove o convite
-    const result = await db.run("DELETE FROM convites WHERE id = ?", [id]);
-
-    // Verifica se algo foi realmente deletado
-    if (result.changes === 0) {
+    // Se não retornou nada = não existia
+    if (deleteRes.length === 0) {
       return NextResponse.json(
         { error: "Convite não encontrado" },
         { status: 404 }

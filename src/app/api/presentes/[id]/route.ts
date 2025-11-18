@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
-import { getDb } from "../../../../../lib/db";
 import fs from "fs";
 import path from "path";
+import { sql } from "../../../../../lib/db";
 
+//
+// ===========================
+//           DELETE
+// ===========================
+//
 export async function DELETE(
   req: Request,
   context: { params: Promise<{ id: string }> }
@@ -17,10 +22,16 @@ export async function DELETE(
       );
     }
 
-    const db = await getDb();
+    //
+    // 🔍 Buscar presente antes de excluir
+    //
+    const result = await sql`
+      SELECT imagem
+      FROM presentes
+      WHERE id = ${id}
+    `;
 
-    // Primeiro busca o presente para remover o arquivo da imagem depois
-    const presente = await db.get("SELECT imagem FROM presentes WHERE id = ?", [id]);
+    const presente = result[0];
 
     if (!presente) {
       return NextResponse.json(
@@ -29,22 +40,28 @@ export async function DELETE(
       );
     }
 
-    // Deleta do banco
-    const result = await db.run("DELETE FROM presentes WHERE id = ?", [id]);
+    //
+    // 🗑 Remover do banco
+    //
+    const del = await sql`
+      DELETE FROM presentes
+      WHERE id = ${id}
+    `;
 
-    if (result.changes === 0) {
+    // Postgres do client retorna array vazio quando não há nada para deletar
+    if (del.length === 0) {
       return NextResponse.json(
         { error: "Nada foi deletado" },
         { status: 404 }
       );
     }
 
+    //
+    // 🧹 Remover arquivo físico
+    //
     if (presente.imagem) {
-        const filePath = path.join(process.cwd(), "public", presente.imagem);
-
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
+      const filePath = path.join(process.cwd(), "public", presente.imagem);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 
     return NextResponse.json({ success: true });
@@ -57,36 +74,54 @@ export async function DELETE(
   }
 }
 
+//
+// ===========================
+//           PATCH
+// ===========================
+//
 export async function PATCH(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
-
   try {
-    const db = await getDb();
+    const { id } = await context.params;
 
-    // Buscar status atual
-    const item = await db.get(
-      "SELECT status FROM presentes WHERE id = ?",
-      [id]
-    );
+    //
+    // 🔍 Buscar status atual
+    //
+    const result = await sql`
+      SELECT status
+      FROM presentes
+      WHERE id = ${id}
+    `;
+
+    const item = result[0];
 
     if (!item) {
-      return NextResponse.json({ error: "Presente não encontrado" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Presente não encontrado" },
+        { status: 404 }
+      );
     }
 
     const novoStatus =
       item.status === "Presentado" ? "Não Presentado" : "Presentado";
 
-    await db.run(
-      "UPDATE presentes SET status = ? WHERE id = ?",
-      [novoStatus, id]
-    );
+    //
+    // 🔄 Atualizar status
+    //
+    await sql`
+      UPDATE presentes
+      SET status = ${novoStatus}
+      WHERE id = ${id}
+    `;
 
     return NextResponse.json({ success: true, status: novoStatus });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: "Erro ao atualizar" }, { status: 500 });
+  } catch (error) {
+    console.error("Erro ao atualizar presente:", error);
+    return NextResponse.json(
+      { error: "Erro ao atualizar presente" },
+      { status: 500 }
+    );
   }
 }

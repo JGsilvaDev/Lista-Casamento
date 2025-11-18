@@ -1,4 +1,4 @@
-import { getDb } from "../../../../lib/db";
+import { sql } from "../../../../lib/db";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Image from "next/image";
@@ -6,31 +6,43 @@ import Image from "next/image";
 export default async function Dashboard() {
   const cookieStore = await cookies();
   const auth = cookieStore.get("admin_auth");
-  if (!auth) redirect("/admin/login");
+  if (!auth) redirect("/login");
 
-  const db = await getDb();
+  // ============================
+  // 📊 CONSULTAS DE ESTATÍSTICAS
+  // ============================
 
-  // STATS
-  const totalConvidados = await db.get("SELECT COUNT(*) as total FROM convidados");
-  const confirmados = await db.get("SELECT COUNT(*) as total FROM convidados WHERE confirmado = 1");
-  const convitesEnviados = await db.get("SELECT COUNT(*) as total FROM convites");
-  const presentesComprados = await db.get("SELECT COUNT(*) as total FROM presentes WHERE status = 'Presentado'");
+  const totalConvidadosRes = await sql`
+    SELECT COUNT(*) AS total FROM convidados
+  `;
+  const confirmadosRes = await sql`
+    SELECT COUNT(*) AS total FROM convidados WHERE confirmado = 1
+  `;
+  const convitesEnviadosRes = await sql`
+    SELECT COUNT(*) AS total FROM convites
+  `;
+  const presentesCompradosRes = await sql`
+    SELECT COUNT(*) AS total FROM presentes WHERE status = 'Presentado'
+  `;
 
+  // Neon retorna COUNT como string → converter
   const stats = {
-    totalConvidados: totalConvidados.total || 0,
-    confirmados: confirmados.total || 0,
-    convitesEnviados: convitesEnviados.total || 0,
-    presentesComprados: presentesComprados.total || 0,
+    totalConvidados: Number(totalConvidadosRes[0].total),
+    confirmados: Number(confirmadosRes[0].total),
+    convitesEnviados: Number(convitesEnviadosRes[0].total),
+    presentesComprados: Number(presentesCompradosRes[0].total),
   };
 
-  // ÚLTIMOS PRESENTES
-  const ultimosPresentes = await db.all(`
-    SELECT p.nome, p.imagem
-    FROM presentes p
-    WHERE p.status = 'Presentado'
-    ORDER BY p.id DESC
+  // ===========================
+  // 🎁 ÚLTIMOS PRESENTES
+  // ===========================
+  const ultimosPresentes = await sql`
+    SELECT nome, imagem
+    FROM presentes
+    WHERE status = 'Presentado'
+    ORDER BY id DESC
     LIMIT 5
-  `);
+  `;
 
   return (
     <div className="p-6">
@@ -47,8 +59,10 @@ export default async function Dashboard() {
       </div>
 
       {/* ÚLTIMOS PRESENTES */}
-      <div className="mt-12 bg-white/90 backdrop-blur-sm p-6 rounded-2xl 
-                      shadow-md border border-[#CADDC6]">
+      <div
+        className="mt-12 bg-white/90 backdrop-blur-sm p-6 rounded-2xl 
+                      shadow-md border border-[#CADDC6]"
+      >
         <h2 className="text-xl font-semibold text-[#3E5641] mb-4">
           Últimos presentes comprados 🎁
         </h2>
@@ -59,7 +73,7 @@ export default async function Dashboard() {
               <span className="font-medium text-gray-700">{item.nome}</span>
               <Image
                 src={item.imagem}
-                alt={item.imagem}
+                alt={item.nome}
                 width={80}
                 height={80}
                 className="object-cover rounded-xl shadow-sm border border-[#D8E2D2]"

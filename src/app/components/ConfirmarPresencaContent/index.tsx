@@ -157,7 +157,7 @@ export default function ConfirmarPresencaPage() {
         const valid = await validarNome(nome);
 
         if (!valid) {
-            router.push(`/confirmar?nome=${encodeURIComponent(nome)}`);
+            router.push(`/`);
             return;
         }
 

@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { getDb } from "../../../../lib/db";
+import { sql } from "../../../../lib/db";
 import QRCode from "qrcode";
 
 export async function POST(req: Request) {
-  const db = await getDb();
   const body = await req.json();
-
   const { nome, telefone, totalPessoas, convidados } = body;
 
   if (!nome) {
@@ -20,27 +18,36 @@ export async function POST(req: Request) {
 
   const qr = await QRCode.toDataURL(conviteUrl);
 
-  // Insere convite
-  const result = await db.run(
-    `
-    INSERT INTO convites (nome, telefone, total_pessoas, qr_code)
-    VALUES (?, ?, ?, ?)
-    `,
-    [nome, telefone, totalPessoas, qr]
-  );
+  try {
+    // ============================
+    // 📌 INSERE CONVITE (Postgres)
+    // ============================
+    const conviteRes = await sql`
+      INSERT INTO convites (nome, telefone, total_pessoas, qr_code)
+      VALUES (${nome}, ${telefone}, ${totalPessoas}, ${qr})
+      RETURNING id
+    `;
 
-  const conviteId = result.lastID;
+    const conviteId = conviteRes[0].id;
 
-  // Insere convidados
-  for (const convidado of convidados) {
-    await db.run(
-      `
-      INSERT INTO convidados (convite_id, nome)
-      VALUES (?, ?)
-    `,
-      [conviteId, convidado]
+    // ============================
+    // 👥 INSERE CONVIDADOS
+    // ============================
+    if (Array.isArray(convidados)) {
+      for (const convidado of convidados) {
+        await sql`
+          INSERT INTO convidados (convite_id, nome)
+          VALUES (${conviteId}, ${convidado})
+        `;
+      }
+    }
+
+    return NextResponse.json({ success: true, conviteId });
+  } catch (err) {
+    console.error("Erro ao criar convite:", err);
+    return NextResponse.json(
+      { error: "Erro ao criar convite" },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({ success: true, conviteId });
 }
