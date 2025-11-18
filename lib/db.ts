@@ -45,6 +45,13 @@ export async function initDb() {
       criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
+
+  await sql`
+    ALTER TABLE convidados ALTER COLUMN id TYPE BIGINT;
+    ALTER TABLE convites ALTER COLUMN id TYPE BIGINT;
+    ALTER TABLE presentes ALTER COLUMN id TYPE BIGINT;
+  `;
+
 }
 
 export { sql };
