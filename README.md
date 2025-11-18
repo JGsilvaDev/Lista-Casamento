@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💍 Lista de Casamento – Gestão de Convidados e Presentes
 
-## Getting Started
+Aplicação desenvolvida em **Next.js** para auxiliar no gerenciamento de um casamento, permitindo controlar convidados, confirmações de presença, lista de presentes e organização geral do evento.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Tecnologias Utilizadas
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### **Frontend**
+- Next.js 14
+- React
+- TypeScript
+- TailwindCSS
+- Lucide Icons
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### **Backend (parcial / em desenvolvimento)**
+- API local simulada
+- Futuro backend em FastAPI
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🔥 Funcionalidades
 
-To learn more about Next.js, take a look at the following resources:
+### 🎁 **Gerenciamento de Presentes**
+- Listagem completa de presentes
+- Cadastro de novos presentes com imagem
+- Edição e remoção
+- Preview de imagem antes de salvar
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🧑‍🤝‍🧑 **Gerenciamento de Convidados**
+- Controle de convidados
+- Atualização de quantidade de pessoas
+- Confirmação de presença (RSVP)
+- Tela de login para convidados específicos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 📸 **Upload de Imagens**
+- Pré-visualização usando `URL.createObjectURL`
+- Suporte a arquivos .jpg / .png
 
-## Deploy on Vercel
+### 💡 **Interface Moderna**
+- Componentes reutilizáveis
+- Design responsivo
+- Navegação fluida com Next.js
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
